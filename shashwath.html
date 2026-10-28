@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodDash AI</title>
+    <style>
+        :root {
+            --page-bg: #0b1120;
+            --panel-bg: rgba(30, 41, 59, 0.55);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-primary: #38bdf8;
+            --accent-secondary: #6366f1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, #172554, var(--page-bg) 55%);
+            color: var(--text-main);
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        header {
+            min-height: 76px;
+            padding: 16px 8%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .logo h1 {
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .logo img {
+            display: block;
+            width: 190px;
+            max-width: 48vw;
+            height: auto;
+        }
+
+        .logo span {
+            color: var(--accent-primary);
+        }
+
+        .header-badge {
+            padding: 8px 14px;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 999px;
+            color: var(--accent-primary);
+            font-size: 13px;
+        }
+
+        main {
+            width: min(1120px, 84%);
+            min-height: calc(100vh - 76px);
+            margin: 0 auto;
+            padding: 48px 0;
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            align-items: center;
+            gap: 48px;
+        }
+
+        .info-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .info-panel h2 {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .info-panel p {
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .feature-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 16px;
+            border-radius: 12px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .order-link {
+            display: inline-block;
+            margin-top: 24px;
+            padding: 13px 18px;
+            border-radius: 12px;
+            color: #0f172a;
+            background: var(--accent-primary);
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        /* Chat Architecture */
+        .chat-wrapper {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .chat-header {
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bot-avatar {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .chat-header-meta h3 { font-size: 16px; font-weight: 600; }
+        .chat-header-meta p { font-size: 12px; color: var(--accent-primary); font-weight: 500; }
+
+        .chat-messages {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .msg-bubble {
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .msg-bubble.bot {
+            background: rgba(255, 255, 255, 0.06);
+            color: #e2e8f0;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .msg-bubble.user {
+            background: var(--accent-secondary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input-container input {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 20px;
+            border-radius: 14px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input-container input:focus {
+            border-color: var(--accent-primary);
+        }
+
+        .chat-input-container button {
+            background: var(--accent-primary);
+            color: #0f172a;
+            border: none;
+            padding: 0 24px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .chat-input-container button:hover {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 760px) {
+            header {
+                padding-right: 6%;
+                padding-left: 6%;
+            }
+
+            main {
+                width: 90%;
+                grid-template-columns: 1fr;
+                gap: 28px;
+                padding: 32px 0;
+            }
+
+            .info-panel {
+                padding: 28px;
+            }
+
+            .info-panel h2 {
+                font-size: 30px;
+            }
+
+            .chat-wrapper {
+                height: min(600px, 70vh);
+                min-height: 420px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="fooddash-logo.svg" alt="FoodDash AI">
+        </div>
+        <div class="header-badge">Next-Gen Engine</div>
+    </header>
+
+    <main>
+        <section class="info-panel">
+            <h2>Beyond ordinary food ordering.</h2>
+            <p>Welcome to an intelligent food companion. Tell the engine what ingredients you have, what flavors you crave, or ask for healthy alternative transformations.</p>
+            <div>
+                <span class="feature-tag">💡 Recipe Architect</span>
+                <span class="feature-tag">⚡ Smart Substitutes</span>
+                <span class="feature-tag">🌱 Calorie Counters</span>
+                <span class="feature-tag">🎯 Meal Planners</span>
+            </div>
+            <a class="order-link" href="https://fooddash-chatbot.onrender.com/">Open FoodDash ordering &amp; Admin →</a>
+        </section>
+
+        <section class="chat-wrapper">
+            <div class="chat-header">
+                <div class="bot-avatar">🤖</div>
+                <div class="chat-header-meta">
+                    <h3>Culinary AI Engine</h3>
+                    <p>Online & Processing</p>
+                </div>
+            </div>
+            <div class="chat-messages" id="chatBox">
+                <div class="msg-bubble bot">Salutations! I am your hyper-intelligent culinary assistant. Try typing: <br><br>• <b>"Ingredients: eggs, bread, tomato"</b> to find combinations.<br>• <b>"Healthy alternative for pizza"</b>.<br>• <b>"Plan a high-protein lunch"</b>.</div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" id="userInput" placeholder="Ask for recipes, healthy alternatives, or plan..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Intelligent localized inference script simulating advanced processing matrices
+        function computeAIResponse(input) {
+            const query = input.toLowerCase().trim();
+
+            if (query.includes('ingredients:') || query.includes('have:') || query.includes('fridge')) {
+                return "🔍 [Recipe Parser Matrix Active]: Based on those items, you can create a Fresh Tomato Egg Skillet Toast. Sauté the diced tomatoes, crack the eggs directly into the pan over medium heat, and serve on toasted bread. Dynamic estimation: ~310 kcal, 18g Protein.";
+            }
+            if (query.includes('alternative') || query.includes('healthy') || query.includes('substitute')) {
+                return "🌱 [Nutritional Substitution Engine]: Swapping traditional heavy profiles. Instead of standard pizza, try a Cauliflower Crust Pizza variant topped with crushed vine tomatoes, fresh low-moisture mozzarella, and micro basil. Reduces carbohydrate intake by roughly 65% while keeping flavor profiles authentic.";
+            }
+            if (query.includes('plan') || query.includes('lunch') || query.includes('protein') || query.includes('diet')) {
+                return "🎯 [Macro Allocation Output]: High-Protein Builder Configuration. Recommended Lunch: Grilled Lemon Herb Chicken breast paired with seasoned quinoa and roasted asparagus spears. Macros: 42g Protein, 35g Complex Carbs, 8g Essential Lipids.";
+            }
+            if (query.includes('hello') || query.includes('hi') || query.includes('hey')) {
+                return "Greetings! I am your culinary AI assistant. You can ask me for recipes, healthy alternatives, or meal planning suggestions.";
+            }
+
+            return "I can help with recipes, ingredient ideas, healthy substitutions, and meal plans. Tell me what you have or what you're craving!";
+        }
+
+        function appendMessage(message, sender) {
+            const chatBox = document.getElementById('chatBox');
+            const bubble = document.createElement('div');
+            bubble.className = `msg-bubble ${sender}`;
+            bubble.textContent = message;
+            chatBox.appendChild(bubble);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+
+            if (!message) {
+                input.focus();
+                return;
+            }
+
+            appendMessage(message, 'user');
+            input.value = '';
+            appendMessage(computeAIResponse(message), 'bot');
+            input.focus();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>
